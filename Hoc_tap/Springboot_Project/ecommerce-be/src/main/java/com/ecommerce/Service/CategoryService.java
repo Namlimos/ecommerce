@@ -7,4 +7,6 @@ import org.springframework.http.ResponseEntity;
 public interface CategoryService {
 
     ResponseEntity<BaseResponse<String>> addCategory(CategoryRequest categoryRequest);
+
+    ResponseEntity<BaseResponse<String>> deleteCategoryByName(String categoryName);
 }

@@ -15,10 +15,14 @@ public class CategoryController{
 
     private final CategoryService categoryService;
 
-    @PostMapping("/add")
-    public ResponseEntity<BaseResponse<String>> addCategory(@RequestBody CategoryRequest category){
-       return categoryService.addCategory(category);
+    @PostMapping(value = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<BaseResponse<String>> addCategory(@ModelAttribute CategoryRequest categoryRequest) {
+        return categoryService.addCategory(categoryRequest);
+    }
 
+    @PostMapping("/delete/{categoryName}")
+    public ResponseEntity<BaseResponse<String>> deleteCategory(@PathVariable String categoryName){
+        return categoryService.deleteCategoryByName(categoryName);
     }
 
 }

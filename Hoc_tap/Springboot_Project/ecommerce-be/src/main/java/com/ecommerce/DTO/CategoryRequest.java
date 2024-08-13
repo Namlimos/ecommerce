@@ -10,5 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class CategoryRequest {
     private String categoryName;
+    private MultipartFile image;
 
 }
