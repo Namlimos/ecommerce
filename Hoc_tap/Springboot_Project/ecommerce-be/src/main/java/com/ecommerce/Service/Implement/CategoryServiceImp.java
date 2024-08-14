@@ -6,6 +6,7 @@ import com.ecommerce.DTO.ResponseCode;
 import com.ecommerce.Entity.Category;
 import com.ecommerce.Repository.CategoryRepository;
 import com.ecommerce.Service.CategoryService;
+import com.ecommerce.Service.SaveImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,8 @@ import java.util.UUID;
 public class CategoryServiceImp implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    private final SaveImageService saveImageService;
 
     @Value("${category.upload-dir}")
     private String uploadDir;
@@ -56,7 +59,7 @@ public class CategoryServiceImp implements CategoryService {
             String fileName = null;
 
             if (file != null && !file.isEmpty()) {
-                fileName = saveImage(file, categoryRequest.getCategoryName());
+                fileName = saveImageService.saveImage(file, categoryRequest.getCategoryName());
             }
 
             // Create and save the new category
@@ -85,40 +88,7 @@ public class CategoryServiceImp implements CategoryService {
         }
     }
 
-    private String saveImage(MultipartFile file, String categoryName) throws IOException {
-        // Create the directory if it doesn't exist
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
 
-        // Clean the category name to create a safe file name
-        String cleanCategoryName = categoryName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
-
-        // Get the file extension
-        String originalFileName = file.getOriginalFilename();
-        String extension = "";
-        if (originalFileName != null && originalFileName.contains(".")) {
-            extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        }
-
-        // Construct the full file name with the category name
-        String fileName = cleanCategoryName + extension;
-
-        // Ensure the file name is unique
-        Path filePath = Paths.get(uploadDir, fileName);
-        int counter = 1;
-        while (Files.exists(filePath)) {
-            fileName = cleanCategoryName + "_" + counter + extension;
-            filePath = Paths.get(uploadDir, fileName);
-            counter++;
-        }
-
-        // Save the file to the specified directory
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return fileName;
-    }
 
     @Override
     public ResponseEntity<BaseResponse<String>> deleteCategoryByName(String categoryName) {

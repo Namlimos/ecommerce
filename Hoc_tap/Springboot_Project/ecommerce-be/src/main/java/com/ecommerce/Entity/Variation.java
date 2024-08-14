@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 
@@ -20,8 +21,9 @@ public class Variation {
 
     private String variationName;
 
-    @OneToMany(mappedBy = "variation")
-    private List<ProductItem> productItems;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private ProductItem productItems;
 
     @OneToMany(mappedBy = "variation")
     private List<VariationOption> variationOptions;

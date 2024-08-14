@@ -21,6 +21,7 @@ public class VariationOption {
     private String optionValue;
 
     private Integer quantity;
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "variation_id")
