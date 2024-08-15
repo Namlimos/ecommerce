@@ -9,8 +9,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VariationRequest {
-
+public class VariationDto {
     private String variationName;
+    private Long productId;
     private List<VariationOptionRequest> options;
 }

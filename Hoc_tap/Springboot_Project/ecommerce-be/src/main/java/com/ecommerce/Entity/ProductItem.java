@@ -1,5 +1,7 @@
 package com.ecommerce.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,9 +31,11 @@ public class ProductItem {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @JsonBackReference
     private Category category;
 
     @OneToMany(mappedBy = "productItems")
+    @JsonManagedReference
     private List<Variation> variations;
 
     // Getters and Setters

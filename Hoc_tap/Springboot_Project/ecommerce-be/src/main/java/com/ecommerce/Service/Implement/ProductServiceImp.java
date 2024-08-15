@@ -3,7 +3,6 @@ package com.ecommerce.Service.Implement;
 import com.ecommerce.DTO.*;
 import com.ecommerce.Entity.*;
 import com.ecommerce.Repository.*;
-import com.ecommerce.Service.ImageStorageService;
 import com.ecommerce.Service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,11 +23,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductServiceImp implements ProductService {
 
-    private final ProductRepository productRepository;
+    private final ProductItemRepository productItemRepository;
     private final VariationRepository variationRepository;
     private final VariationOptionRepository variationOptionRepository;
     private final CategoryRepository categoryRepository;
-    private final ImageStorageService imageStorageService;
     private final ProductImageRepository productImageRepository;
     private final ModelMapper modelMapper;
 
@@ -72,16 +70,60 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ResponseEntity<BaseResponse<String>> addProduct(ProductRequest productRequest) {
+    public ResponseEntity<BaseResponse<ProductResponse>> addProduct(ProductRequest productRequest) {
         ProductItem product = modelMapper.map(productRequest, ProductItem.class);
-        product = productRepository.save(product);
-        List<ProductImage> productImages = productImageRepository.findByDraftProductId(productRequest.getDraftProductId());
-        for (ProductImage productImage : productImages) {
-            productImage.setProductItem(product);
-            productImage.setDraftProductId(null); // Clear the draft ID
-            productImageRepository.save(productImage);
+
+        Optional<Category> categoryOtp = categoryRepository.findById(productRequest.getCategoryId());
+        if(categoryOtp.isPresent()){
+            Category category = categoryOtp.get();
+            product.setCategory(category);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new BaseResponse<>(
+                            ResponseCode.NOT_FOUND.getCode(),
+                            "Category not found",
+                            null
+                    ));
         }
 
-        return null;
+        product = productItemRepository.save(product);
+        List<ProductImage> productImages = productImageRepository.findByDraftProductId(productRequest.getDraftProductId());
+        if(productImages.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new BaseResponse<>(
+                            ResponseCode.NOT_FOUND.getCode(),
+                            "Product Id: " + productRequest.getDraftProductId() + "  Not found",
+                            null
+                    ));
+        }
+        else {
+            for (ProductImage productImage : productImages) {
+                productImage.setProductItem(product);
+                productImage.setDraftProductId(null); // Clear the draft ID
+            }
+            productImageRepository.saveAll(productImages); // Save all product images in a single batch operation
+
+            // Map the saved ProductItem entity to the ProductResponse DTO
+            ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+            productResponse.setCategoryId(product.getCategory().getId());
+
+            // Return a successful response with the ProductResponse
+            return ResponseEntity.ok(new BaseResponse<>(
+                    ResponseCode.SUCCESS.getCode(),
+                    "Product uploaded successfully",
+                    productResponse
+            ));
+        }
+
+
     }
+
+    @Override
+    public ResponseEntity<List<ProductItem>> getAllProduct() {
+        List<ProductItem> items = productItemRepository.findAll();
+        return ResponseEntity.ok().body(items);
+    }
+
+
 }

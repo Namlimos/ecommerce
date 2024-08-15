@@ -1,10 +1,11 @@
 package com.ecommerce.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class Variation {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonBackReference
     private ProductItem productItems;
 
     @OneToMany(mappedBy = "variation")

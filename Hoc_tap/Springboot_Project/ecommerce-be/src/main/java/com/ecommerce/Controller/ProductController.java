@@ -3,6 +3,8 @@ package com.ecommerce.Controller;
 
 import com.ecommerce.DTO.BaseResponse;
 import com.ecommerce.DTO.ProductRequest;
+import com.ecommerce.DTO.ProductResponse;
+import com.ecommerce.Entity.ProductItem;
 import com.ecommerce.Service.ProductService;
 
 
@@ -16,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ProductController {
 
     @PostMapping("/images/add")
     private ResponseEntity<BaseResponse<String>> uploadImages( @RequestParam("images") MultipartFile[] images,
-                                                                     @RequestParam("draftProductId") Long draftProductId){
+                                                                         @RequestParam("draftProductId") Long draftProductId){
         return productService.uploadImages(images, draftProductId);
     }
     @GetMapping("/{filename:.+}")
@@ -55,9 +56,13 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<BaseResponse<String>> addProduct(@RequestBody ProductRequest productRequest) {
+    public ResponseEntity<BaseResponse<ProductResponse>> addProduct(@RequestBody ProductRequest productRequest) {
         return productService.addProduct(productRequest);
     }
 
+    @GetMapping("/get/all-Product")
+    public ResponseEntity<List<ProductItem>> getAllProduct() {
+        return productService.getAllProduct();
+    }
 
 }
