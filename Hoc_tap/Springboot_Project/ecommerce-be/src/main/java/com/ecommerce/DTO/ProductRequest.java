@@ -15,10 +15,7 @@ public class ProductRequest {
     private String name;
     private String sku;
     private String brand;
-    private int quantity;
-    private BigDecimal price;
     private String description;
     private Long categoryId;
     private List<VariationDto> variations;
-    private List<String> fileId;
 }

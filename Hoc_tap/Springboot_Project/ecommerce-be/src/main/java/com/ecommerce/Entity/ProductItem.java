@@ -20,13 +20,11 @@ public class ProductItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_item_id")
     private Long id;
+
     private String name;
-    private String sku;
     private String brand;
-    private int quantity;
-    private BigDecimal price;
     private String description;
-    private String imageUrl;
+
     @Column(name = "category_id")
     private Long categoryId;
 
