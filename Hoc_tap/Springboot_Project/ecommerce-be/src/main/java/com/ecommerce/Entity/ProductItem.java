@@ -18,9 +18,8 @@ import java.util.List;
 public class ProductItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    @Column(name = "product_id")
-    private Long productId;
+    @Column(name = "product_item_id")
+    private Long id;
     private String name;
     private String sku;
     private String brand;
@@ -28,15 +27,9 @@ public class ProductItem {
     private BigDecimal price;
     private String description;
     private String imageUrl;
+    @Column(name = "category_id")
+    private Long categoryId;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    @JsonBackReference
-    private Category category;
 
-    @OneToMany(mappedBy = "productItems")
-    @JsonManagedReference
-    private List<Variation> variations;
 
-    // Getters and Setters
 }

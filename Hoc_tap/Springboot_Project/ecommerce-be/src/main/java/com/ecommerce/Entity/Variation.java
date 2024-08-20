@@ -22,13 +22,7 @@ public class Variation {
 
     private String variationName;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    @JsonBackReference
-    private ProductItem productItems;
+    @Column(name = "product_item_id")
+    private Long productItemId;
 
-    @OneToMany(mappedBy = "variation")
-    private List<VariationOption> variationOptions;
-
-    // Getters and Setters
 }

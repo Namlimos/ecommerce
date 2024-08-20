@@ -27,9 +27,8 @@ public class Category {
     @Column(name = "category_image")
     private String categoryImage;
 
-    @OneToMany(mappedBy = "category")
-    @JsonBackReference
-    private List<ProductItem> productItems;
+    @Column(name = "product_id")
+    private Long productItemId;
 
-    // Getters and Setters
+
 }

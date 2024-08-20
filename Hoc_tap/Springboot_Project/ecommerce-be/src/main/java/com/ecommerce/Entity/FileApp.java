@@ -6,23 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "product_image")
+@Table(name = "file")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductImage {
+public class FileApp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "file_url")
+    private String fileUrl;
 
-    @Column(name = "draft_product_id")
-    private Long draftProductId;
+    @Column(name = "file_name")
+    private String fileName;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private ProductItem productItem;
+    @Column(name = "file_type")
+    private String type;
 
 }

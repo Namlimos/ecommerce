@@ -21,10 +21,7 @@ public class VariationOption {
     private String optionValue; // M, L, S , green , blue
     private Integer quantity;
     private BigDecimal price;
+    private Long variationId;
 
-    @ManyToOne
-    @JoinColumn(name = "variation_id")
-    @JsonBackReference
-    private Variation variation;
 
 }

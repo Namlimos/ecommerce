@@ -4,13 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VariationDto {
-    private String variationName;
+public class FileProductItemDto {
+
+    private Long fileId;
+
     private Long productItemId;
-    private List<VariationOptionRequest> options;
+
+    private Long categoryId;
+    private String fileUrl;  // Add this field
+
 }

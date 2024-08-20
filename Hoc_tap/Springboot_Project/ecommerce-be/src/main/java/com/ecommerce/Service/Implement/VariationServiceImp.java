@@ -33,45 +33,39 @@ public class VariationServiceImp implements VariationService {
 
     @Override
     public ResponseEntity<BaseResponse<VariationDto>> addVariationToProduct(VariationDto variationDto) {
-        Variation variation = modelMapper.map(variationDto, Variation.class);
-        ProductItem productItemOptional = productItemRepository.findById(variationDto.getProductId())
+        // Fetch the product item and handle the exception properly
+        ProductItem productItem = productItemRepository.findById(variationDto.getProductItemId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        variation.setProductItems(productItemOptional);
 
-//        // Map and set the VariationOptions
-//        List<VariationOption> variationOptions = variationDto.getOptions().stream()
-//                .map(optionRequest -> {
-//                    VariationOption option = modelMapper.map(optionRequest, VariationOption.class);
-//                    option.setVariation(variation); // Set the parent Variation
-//                    return option;
-//                })
-//                .collect(Collectors.toList());
-//
-//        // Save all VariationOptions to the database
-//        variationOptionRepository.saveAll(variationOptions);
+        // Map the VariationDto to the Variation entity and associate it with the product item
+        Variation variation = modelMapper.map(variationDto, Variation.class);
+        variation.setProductItemId(productItem.getId());
 
-        List<VariationOption> variationOptions = new ArrayList<>();
-        for (VariationOptionRequest optionRequest : variationDto.getOptions()){
-            VariationOption variationOption = new VariationOption();
-            variationOption.setOptionValue(optionRequest.getOptionValue());
-            variationOption.setPrice(optionRequest.getPrice());
-            variationOption.setQuantity(optionRequest.getQuantity());
-            variationOption.setVariation(variation);
-            variationOptions.add(variationOption);
-        }
-        variation.setVariationOptions(variationOptions);
-
+        // Save the variation first to ensure it has an ID for the variation options
         variation = variationRepository.save(variation);
 
-        for (VariationOption variationOption : variationOptions) {
-            variationOptionRepository.save(variationOption);
-        }
+        // Map and save the variation options
+
+        Variation finalVariation = variation;
+        List<VariationOption> variationOptions = variationDto.getOptions().stream()
+                .map(optionRequest -> {
+                    VariationOption variationOption = modelMapper.map(optionRequest, VariationOption.class);
+                    variationOption.setVariationId(finalVariation.getId());
+                    return variationOption;
+                })
+                .collect(Collectors.toList());
+
+        variationOptionRepository.saveAll(variationOptions);
+
+        // Update the variationDto with the saved variation's ID (if needed)
 
 
+        // Return a successful response with the updated variationDto
         return ResponseEntity.ok(new BaseResponse<>(
                 ResponseCode.SUCCESS.getCode(),
-                "Product uploaded successfully",
+                "Variation added successfully",
                 variationDto
         ));
     }
+
 }

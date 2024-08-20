@@ -13,5 +13,7 @@ public class VariationOptionRequest {
     private String optionValue;
     private Integer quantity;
     private BigDecimal price;
+    private Long variationId;
+
 
 }

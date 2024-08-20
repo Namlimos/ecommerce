@@ -6,6 +6,7 @@ import com.ecommerce.Repository.*;
 import com.ecommerce.Service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,102 +29,155 @@ public class ProductServiceImp implements ProductService {
     private final VariationRepository variationRepository;
     private final VariationOptionRepository variationOptionRepository;
     private final CategoryRepository categoryRepository;
-    private final ProductImageRepository productImageRepository;
+    private final FileProductItemRepository fileProductItemRepository;
+    private final FileAppRepository fileAppRepository;
     private final ModelMapper modelMapper;
 
 
-    @Override
-    public ResponseEntity<BaseResponse<String>> uploadImages(MultipartFile[] images, Long draftProductId) {
-        List<String> imageUrls = new ArrayList<>();
-
-        for (MultipartFile image : images) {
-            try {
-                // Định nghĩa đường dẫn lưu trữ tệp
-                String uploadDir = "src/main/resources/Product/";
-                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename(); // Thêm timestamp để tránh trùng lặp tên tệp
-
-                // Lưu tệp vào hệ thống tệp
-                Path path = Paths.get(uploadDir + fileName);
-                Files.createDirectories(path.getParent());
-                Files.write(path, image.getBytes());
-
-                // Tạo URL truy cập hình ảnh
-                String imageUrl = "http://localhost:8080/images/" + fileName;
-                imageUrls.add(imageUrl);
-
-                // Lưu thông tin hình ảnh vào cơ sở dữ liệu
-                ProductImage productImage = new ProductImage();
-                productImage.setDraftProductId(draftProductId);
-                productImage.setImageUrl(imageUrl);
-                productImageRepository.save(productImage);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }
-        return ResponseEntity.ok(new BaseResponse<>(
-                ResponseCode.SUCCESS.getCode(),
-                "Images uploaded successfully",
-                "" + imageUrls
-        ));
-
-    }
 
     @Override
     public ResponseEntity<BaseResponse<ProductResponse>> addProduct(ProductRequest productRequest) {
         ProductItem product = modelMapper.map(productRequest, ProductItem.class);
 
-        Optional<Category> categoryOtp = categoryRepository.findById(productRequest.getCategoryId());
-        if(categoryOtp.isPresent()){
-            Category category = categoryOtp.get();
-            product.setCategory(category);
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BaseResponse<>(
-                            ResponseCode.NOT_FOUND.getCode(),
-                            "Category not found",
-                            null
-                    ));
-        }
+        Category category = categoryRepository.findById(productRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
+        product.setCategoryId(category.getId());
         product = productItemRepository.save(product);
-        List<ProductImage> productImages = productImageRepository.findByDraftProductId(productRequest.getDraftProductId());
-        if(productImages.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BaseResponse<>(
-                            ResponseCode.NOT_FOUND.getCode(),
-                            "Product Id: " + productRequest.getDraftProductId() + "  Not found",
-                            null
-                    ));
-        }
-        else {
-            for (ProductImage productImage : productImages) {
-                productImage.setProductItem(product);
-                productImage.setDraftProductId(null); // Clear the draft ID
+
+        ProductResponse productResponse = null;
+        if (productRequest.getFileId() != null && !productRequest.getFileId().isEmpty()) {
+            for (String fileIdStr : productRequest.getFileId()) {
+                Long fileId = Long.parseLong(fileIdStr);
+
+                FileProductItem fileProductItem = new FileProductItem();
+                fileProductItem.setFileId(fileId);
+                fileProductItem.setProductItemId(product.getId());
+                // Save the FileProductItem entity
+                fileProductItemRepository.save(fileProductItem);
             }
-            productImageRepository.saveAll(productImages); // Save all product images in a single batch operation
 
             // Map the saved ProductItem entity to the ProductResponse DTO
-            ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
-            productResponse.setCategoryId(product.getCategory().getId());
+            productResponse = modelMapper.map(product, ProductResponse.class);
 
-            // Return a successful response with the ProductResponse
-            return ResponseEntity.ok(new BaseResponse<>(
-                    ResponseCode.SUCCESS.getCode(),
-                    "Product uploaded successfully",
-                    productResponse
-            ));
-        }
-
-
+        }            // Return a successful response with the ProductResponse
+        return ResponseEntity.ok(new BaseResponse<>(
+                ResponseCode.SUCCESS.getCode(),
+                "Product uploaded successfully",
+                productResponse
+        ));
     }
 
+
     @Override
-    public ResponseEntity<List<ProductItem>> getAllProduct() {
-        List<ProductItem> items = productItemRepository.findAll();
-        return ResponseEntity.ok().body(items);
+    public ResponseEntity<BaseResponse<List<ProductResponse>>> getAllProduct() {
+        List<ProductResponse> productResponses = productItemRepository.findAll().stream()
+                .map(item -> {
+                    ProductResponse productResponse = modelMapper.map(item, ProductResponse.class);
+                    List<FileAppDto> files = fileProductItemRepository.findAllByProductItemId(item.getId()).stream()
+                            .map(file -> modelMapper.map(file, FileAppDto.class))
+                            .collect(Collectors.toList());
+//                    productResponse.setFiles(files);
+                    return productResponse;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new BaseResponse<>(
+                ResponseCode.SUCCESS.getCode(),
+                "Products fetched successfully",
+                productResponses
+        ));
+    }
+    @Override
+    public ResponseEntity<BaseResponse<ProductResponse>> getProductById(Long productItemId) {
+        ProductItem item = productItemRepository.findById(productItemId)
+                .orElseThrow(() -> new RuntimeException("Product Item not found"));
+        ProductResponse productResponse = modelMapper.map(item, ProductResponse.class);
+
+        List<VariationDto> variations = variationRepository.findAllByProductItemId(item.getId()).stream()
+                .map(variation -> {
+                    VariationDto variationDto = modelMapper.map(variation, VariationDto.class);
+                    List<VariationOptionRequest> options = variationOptionRepository.findByVariationId(variation.getId()).stream()
+                            .map(option -> modelMapper.map(option, VariationOptionRequest.class))
+                            .collect(Collectors.toList());
+                    variationDto.setOptions(options);
+                    return variationDto;
+                })
+                .collect(Collectors.toList());
+
+        // Fetch files and their corresponding URLs
+        List<FileProductItemDto> files = fileProductItemRepository.findAllByProductItemId(item.getId()).stream()
+                .map(fileProductItem -> {
+                    FileProductItemDto fileProductItemDto = modelMapper.map(fileProductItem, FileProductItemDto.class);
+
+                    // Fetch the corresponding FileApp entity using the fileId
+                    FileApp fileApp = fileAppRepository.findById(fileProductItemDto.getFileId())
+                            .orElseThrow(() -> new RuntimeException("File not found"));
+
+                    // Set the fileUrl in FileProductItemDto
+                    fileProductItemDto.setFileUrl(fileApp.getFileUrl());
+
+                    return fileProductItemDto;
+                })
+                .collect(Collectors.toList());
+
+        productResponse.setVariations(variations);
+        productResponse.setFiles(files);
+
+        return ResponseEntity.ok(new BaseResponse<>(
+                ResponseCode.SUCCESS.getCode(),
+                "Product fetched successfully",
+                productResponse
+        ));
+    }
+
+
+    @Override
+    public ResponseEntity<BaseResponse<ProductResponse>> modifyProductById(Long productItemId, ProductRequest productRequest) {
+        ProductItem productItem = productItemRepository.findById(productItemId)
+                .orElseThrow(() -> new RuntimeException("Product Item not found"));
+        Category category = categoryRepository.findById(productRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        productItem.setCategoryId(category.getId());
+
+        modelMapper.map(productRequest, productItem);
+        productItem = productItemRepository.save(productItem);
+        ProductResponse productResponse = modelMapper.map(productItem, ProductResponse.class);
+
+        if (productRequest.getFileId() != null && !productRequest.getFileId().isEmpty()) {
+            for (String fileIdStr : productRequest.getFileId()) {
+                Long fileId = Long.parseLong(fileIdStr);
+
+                FileProductItem fileProductItem = new FileProductItem();
+                fileProductItem.setFileId(fileId);
+                fileProductItem.setProductItemId(productItem.getId());
+                // Save the FileProductItem entity
+                fileProductItemRepository.save(fileProductItem);
+            }
+
+            // Map the saved ProductItem entity to the ProductResponse DTO
+            productResponse = modelMapper.map(productItem, ProductResponse.class);
+            productResponse.setCategoryId(category.getId());
+
+
+        }            // Return a successful response with the ProductResponse
+        return ResponseEntity.ok(new BaseResponse<>(
+                ResponseCode.SUCCESS.getCode(),
+                "Product modified successfully",
+                productResponse
+        ));}
+
+    @Override
+    public ResponseEntity<BaseResponse<String>> deleteProductById(Long productItemId) {
+        ProductItem productItem = productItemRepository.findById(productItemId)
+                .orElseThrow(() -> new RuntimeException("Product Item not found"));
+
+        productItemRepository.delete(productItem);
+        return ResponseEntity.ok(new BaseResponse<>(
+                ResponseCode.SUCCESS.getCode(),
+                "Product deleted successfully",
+                null
+        ));
     }
 
 

@@ -11,9 +11,14 @@ import java.util.List;
 
 public interface ProductService {
 
-    ResponseEntity<BaseResponse<String>> uploadImages(MultipartFile[] images, Long draftProductId);
 
     ResponseEntity<BaseResponse<ProductResponse>> addProduct(ProductRequest productRequest);
 
-    ResponseEntity<List<ProductItem>> getAllProduct();
+    ResponseEntity<BaseResponse<List<ProductResponse>>> getAllProduct();
+
+    ResponseEntity<BaseResponse<ProductResponse>> getProductById(Long productItemId);
+
+    ResponseEntity<BaseResponse<ProductResponse>> modifyProductById(Long productItemId, ProductRequest productRequest);
+
+    ResponseEntity<BaseResponse<String>> deleteProductById(Long productItemId);
 }

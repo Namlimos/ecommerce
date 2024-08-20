@@ -1,5 +1,6 @@
 package com.ecommerce.DTO;
 
+import com.ecommerce.Entity.FileApp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ public class ProductRequest {
     private BigDecimal price;
     private String description;
     private Long categoryId;
-    private Long draftProductId;
     private List<VariationDto> variations;
+    private List<String> fileId;
 }

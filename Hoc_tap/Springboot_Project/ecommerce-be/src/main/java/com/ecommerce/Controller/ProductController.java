@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,32 +29,11 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final String imageDirectory = "src/main/resources/images/";
 
 
-    @PostMapping("/images/add")
-    private ResponseEntity<BaseResponse<String>> uploadImages( @RequestParam("images") MultipartFile[] images,
-                                                                         @RequestParam("draftProductId") Long draftProductId){
-        return productService.uploadImages(images, draftProductId);
-    }
-    @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
-        try {
-            Path filePath = Paths.get(imageDirectory).resolve(filename).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
 
-            if (resource.exists() && resource.isReadable()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_PNG) // Hoặc xác định content type dựa vào file extension
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+
+
 
     @PostMapping("/add")
     public ResponseEntity<BaseResponse<ProductResponse>> addProduct(@RequestBody ProductRequest productRequest) {
@@ -61,8 +41,23 @@ public class ProductController {
     }
 
     @GetMapping("/get/all-Product")
-    public ResponseEntity<List<ProductItem>> getAllProduct() {
+    public ResponseEntity<BaseResponse<List<ProductResponse>>> getAllProduct() {
         return productService.getAllProduct();
     }
 
+    @GetMapping("/get/{productItemId}")
+    public ResponseEntity<BaseResponse<ProductResponse>> getProductById(@PathVariable Long productItemId){
+        return productService.getProductById(productItemId);
+    }
+
+    @PostMapping("/modify")
+    public ResponseEntity<BaseResponse<ProductResponse>> modifyProductById(
+            @RequestParam("productItemId") Long productItemId, @RequestBody ProductRequest productRequest ){
+        return productService.modifyProductById(productItemId, productRequest);
+    }
+
+    @PostMapping("/delete}")
+    public ResponseEntity<BaseResponse<String>> deleteProductById(@RequestParam("productItemId") Long productItemId){
+        return productService.deleteProductById(productItemId);
+    }
 }
