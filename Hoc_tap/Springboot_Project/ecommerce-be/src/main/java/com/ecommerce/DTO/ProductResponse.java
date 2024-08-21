@@ -17,7 +17,6 @@ public class ProductResponse {
     private BigDecimal price;
     private String description;
     private Long categoryId;
-    private List<VariationDto> variations;
     private List<FileProductItemDto> files;
 
 

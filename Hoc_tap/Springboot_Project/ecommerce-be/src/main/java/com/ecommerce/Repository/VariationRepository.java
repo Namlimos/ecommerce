@@ -1,12 +1,11 @@
 package com.ecommerce.Repository;
 
-import com.ecommerce.Entity.Variation;
+import com.ecommerce.Entity.ProductVariation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Collection;
 import java.util.List;
 
-public interface VariationRepository extends JpaRepository<Variation, Long> {
+public interface VariationRepository extends JpaRepository<ProductVariation, Long> {
 
-    List<Variation> findAllByProductItemId(Long id);
+    List<ProductVariation> findAllByProductItemId(Long id);
 }

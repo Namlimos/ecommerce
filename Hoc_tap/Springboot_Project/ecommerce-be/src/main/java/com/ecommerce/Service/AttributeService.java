@@ -2,7 +2,6 @@ package com.ecommerce.Service;
 
 import com.ecommerce.DTO.AttributeRequest;
 import com.ecommerce.DTO.BaseResponse;
-import com.ecommerce.Entity.Attribute;
 import org.springframework.http.ResponseEntity;
 
 public interface AttributeService {

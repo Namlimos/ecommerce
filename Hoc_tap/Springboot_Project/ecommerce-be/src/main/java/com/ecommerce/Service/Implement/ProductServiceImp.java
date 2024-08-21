@@ -27,7 +27,6 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductItemRepository productItemRepository;
     private final VariationRepository variationRepository;
-    private final VariationOptionRepository variationOptionRepository;
     private final CategoryRepository categoryRepository;
     private final FileProductItemRepository fileProductItemRepository;
     private final FileAppRepository fileAppRepository;
@@ -94,16 +93,7 @@ public class ProductServiceImp implements ProductService {
                 .orElseThrow(() -> new RuntimeException("Product Item not found"));
         ProductResponse productResponse = modelMapper.map(item, ProductResponse.class);
 
-        List<VariationDto> variations = variationRepository.findAllByProductItemId(item.getId()).stream()
-                .map(variation -> {
-                    VariationDto variationDto = modelMapper.map(variation, VariationDto.class);
-                    List<VariationOptionRequest> options = variationOptionRepository.findByVariationId(variation.getId()).stream()
-                            .map(option -> modelMapper.map(option, VariationOptionRequest.class))
-                            .collect(Collectors.toList());
-                    variationDto.setOptions(options);
-                    return variationDto;
-                })
-                .collect(Collectors.toList());
+//
 
         // Fetch files and their corresponding URLs
         List<FileProductItemDto> files = fileProductItemRepository.findAllByProductItemId(item.getId()).stream()
@@ -121,7 +111,7 @@ public class ProductServiceImp implements ProductService {
                 })
                 .collect(Collectors.toList());
 
-        productResponse.setVariations(variations);
+//        productResponse.setVariations(variations);
         productResponse.setFiles(files);
 
         return ResponseEntity.ok(new BaseResponse<>(

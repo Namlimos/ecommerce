@@ -20,7 +20,6 @@ public class ProductItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_item_id")
     private Long id;
-
     private String name;
     private String brand;
     private String description;

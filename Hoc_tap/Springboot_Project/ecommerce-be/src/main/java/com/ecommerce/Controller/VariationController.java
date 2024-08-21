@@ -1,24 +1,22 @@
 package com.ecommerce.Controller;
 
 import com.ecommerce.DTO.BaseResponse;
-import com.ecommerce.DTO.VariationDto;
-import com.ecommerce.Service.VariationService;
+import com.ecommerce.DTO.ProductVariationRequest;
+import com.ecommerce.Service.ProductVariationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/variation")
 @RequiredArgsConstructor
 public class VariationController {
 
-    private final VariationService variationService;
+    private final ProductVariationService productVariationService;
 
     @PostMapping("/add")
-    public ResponseEntity<BaseResponse<VariationDto>> addVariation(@RequestBody VariationDto variationDto) {
-        return variationService.addVariation(variationDto);
+    public ResponseEntity<BaseResponse<ProductVariationRequest>> addVariation(@RequestBody ProductVariationRequest productVariationRequest) {
+        return productVariationService.addVariation(productVariationRequest);
     }
 
 }

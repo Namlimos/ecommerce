@@ -2,7 +2,6 @@ package com.ecommerce.Controller;
 
 import com.ecommerce.DTO.AttributeRequest;
 import com.ecommerce.DTO.BaseResponse;
-import com.ecommerce.Entity.Attribute;
 import com.ecommerce.Service.AttributeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

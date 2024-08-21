@@ -1,11 +1,9 @@
 package com.ecommerce.DTO;
 
-import com.ecommerce.Entity.FileApp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -17,6 +15,5 @@ public class ProductRequest {
     private String brand;
     private String description;
     private Long categoryId;
-    private List<VariationDto> variations;
     private List<String> fileId;
 }

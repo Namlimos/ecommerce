@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "variation")
+@Table(name = "prodcut_variation")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Variation {
+public class ProductVariation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +21,8 @@ public class Variation {
     @Column(name = "product_item_id")
     private Long productItemId;
 
+    private String sku;
     private BigDecimal price;
-
     private Integer quantity;
 
-    private String SKU;
 }
