@@ -18,4 +18,5 @@ public class ProductRequest {
     private String description;
     private Long categoryId;
     private List<VariationDto> variations;
+    private List<String> fileId;
 }

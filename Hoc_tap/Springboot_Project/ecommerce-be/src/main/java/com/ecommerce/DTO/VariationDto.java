@@ -11,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VariationDto {
+    private Long productItemId;
     private String SKU;
     private BigDecimal price;
     private Integer quantity;
-    private Long productItemId;
-    private List<VariationOptionRequest> options;
+    private List<AttributeValueRequest> attributeValueRequests;
 }

@@ -56,7 +56,7 @@ public class ProductController {
         return productService.modifyProductById(productItemId, productRequest);
     }
 
-    @PostMapping("/delete}")
+    @PostMapping("/delete")
     public ResponseEntity<BaseResponse<String>> deleteProductById(@RequestParam("productItemId") Long productItemId){
         return productService.deleteProductById(productItemId);
     }

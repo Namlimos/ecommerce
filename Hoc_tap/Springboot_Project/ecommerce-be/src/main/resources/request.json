@@ -1,10 +1,4 @@
 {
-  "Product": {
-    "ProductId": 1,
-    "ProductName": "Áo thun",
-    "CategoryId": 2,
-    "BasePrice": 200000
-  },
   "Variants": [
     {
       "SKU": "TSHIRT_RED_S",
@@ -42,5 +36,6 @@
         {"AttributeId": 2, "Value": "L"}
       ]
     }
-  ]
-}
+    ]
+  }
+
