@@ -11,13 +11,25 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductResponse {
     private String name;
-    private String sku;
     private String brand;
     private int quantity;
-    private BigDecimal price;
     private String description;
     private Long categoryId;
     private List<FileProductItemDto> files;
+    private List<VariantDto> variants;
 
+    @Data
+    public static class VariantDto {
+        private String sku;
+        private BigDecimal price;
+        private Integer stockQuantity;
+        private List<AttributeValueDto> attributes;
+
+        @Data
+        public static class AttributeValueDto {
+            private String attributeName;
+            private String value;
+        }
+    }
 
 }

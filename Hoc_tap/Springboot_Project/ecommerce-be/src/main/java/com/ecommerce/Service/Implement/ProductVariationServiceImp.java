@@ -27,10 +27,11 @@ public class ProductVariationServiceImp implements ProductVariationService {
     public ResponseEntity<BaseResponse<ProductVariationRequest>> addVariation(ProductVariationRequest productVariationRequest) {
         ProductItem productItem = productItemRepository.findById(productVariationRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        ProductVariation productVariation = new ProductVariation();
-        productVariation.setProductItemId(productItem.getId());
+
 
         for(ProductVariationRequest.VariantDto variantDto : productVariationRequest.getVariants()){
+            ProductVariation productVariation = new ProductVariation();
+            productVariation.setProductItemId(productItem.getId());
             productVariation.setSku(variantDto.getSku());
             productVariation.setPrice(variantDto.getPrice());
             productVariation.setQuantity(variantDto.getStockQuantity());

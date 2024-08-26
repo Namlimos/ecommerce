@@ -17,6 +17,6 @@ public class VariationAttributeValue {
 
     private Long variationId;
 
-    private Long AttributeValueId;
+    private Long attributeValueId;
 
 }

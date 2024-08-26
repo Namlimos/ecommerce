@@ -23,7 +23,6 @@ public class ProductItem {
     private String name;
     private String brand;
     private String description;
-
     @Column(name = "category_id")
     private Long categoryId;
 
