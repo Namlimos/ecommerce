@@ -1,0 +1,42 @@
+{
+  "productId": "1",
+  "Variants": [
+    {
+      "SKU": "TSHIRT_RED_S",
+      "Price": 210000,
+      "StockQuantity": 50,
+      "Attributes": [
+        {"AttributeId": 1, "Value": "Đỏ"},
+        {"AttributeId": 2, "Value": "S"}
+      ]
+    },
+    {
+      "SKU": "TSHIRT_RED_M",
+      "Price": 220000,
+      "StockQuantity": 30,
+      "Attributes": [
+        {"AttributeId": 1, "Value": "Đỏ"},
+        {"AttributeId": 2, "Value": "M"}
+      ]
+    },
+    {
+      "SKU": "TSHIRT_BLUE_S",
+      "Price": 200000,
+      "StockQuantity": 40,
+      "Attributes": [
+        {"AttributeId": 1, "Value": "Xanh"},
+        {"AttributeId": 2, "Value": "S"}
+      ]
+    },
+    {
+      "SKU": "TSHIRT_BLUE_L",
+      "Price": 230000,
+      "StockQuantity": 20,
+      "Attributes": [
+        {"AttributeId": 1, "Value": "Xanh"},
+        {"AttributeId": 2, "Value": "L"}
+      ]
+    }
+    ]
+  }
+
